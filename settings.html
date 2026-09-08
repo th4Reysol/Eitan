@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English SAGA — Settings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="main.css">
+<script src="theme.js"></script>
+</head>
+<body>
+
+  <main class="stage">
+    <div class="device">
+
+      <div class="statusbar" aria-hidden="true">
+        <span class="statusbar__time">9:41</span>
+        <span class="statusbar__icons">•••</span>
+      </div>
+
+      <header class="topbar">
+        <h1 class="topbar__title">Settings</h1>
+      </header>
+
+      <section class="settings-list" aria-label="カラー設定">
+        <div class="settings-row">
+          <span class="settings-row__label">Text Color</span>
+          <select class="settings-row__select" id="textColorSelect">
+            <option value="#12181C">Default</option>
+            <option value="#2E2E2E">Charcoal</option>
+            <option value="#1B2A4A">Navy</option>
+            <option value="#3C4858">Slate</option>
+            <option value="#1F3D34">Dark Green</option>
+          </select>
+        </div>
+
+        <div class="settings-row">
+          <span class="settings-row__label">Button Color</span>
+          <select class="settings-row__select" id="buttonColorSelect">
+            <option value="#6CE4CF">Default</option>
+            <option value="#FF8C7A">Coral</option>
+            <option value="#6CB4E4">Sky Blue</option>
+            <option value="#F2B84B">Amber</option>
+            <option value="#B79CED">Lavender</option>
+            <option value="#F2879B">Rose</option>
+          </select>
+        </div>
+
+        <div class="settings-row">
+          <span class="settings-row__label">Back Color</span>
+          <select class="settings-row__select" id="backColorSelect">
+            <option value="#EEF9F6">Default</option>
+            <option value="#FBF3E7">Cream</option>
+            <option value="#EDEFF1">Soft Gray</option>
+            <option value="#FBEAEE">Blush</option>
+            <option value="#E8F2FB">Sky</option>
+          </select>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <button type="button" class="pill pill--date" id="applyBtn">
+          <span class="pill__label">APPLY</span>
+        </button>
+
+        <button type="button" class="pill pill--exit" id="cancelBtn">
+          <span class="pill__label">Cancel</span>
+        </button>
+      </footer>
+
+    </div>
+  </main>
+
+<script src="settings.js"></script>
+</body>
+</html>

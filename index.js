@@ -11,6 +11,14 @@ document.querySelectorAll(".menu .tile").forEach((tile) => {
   });
 });
 
+// --- 「Settings」ボタン ---
+const settingsBtn = document.getElementById("settingsBtn");
+if (settingsBtn) {
+  settingsBtn.addEventListener("click", () => {
+    window.location.href = "settings.html";
+  });
+}
+
 // --- 「Close This App」ボタン ---
 // window.close() はブラウザの仕様上、スクリプトが開いたウィンドウでないと効かない。
 // Android等で「ホーム画面に追加」してPWAとして起動した場合は閉じられることが多いが、

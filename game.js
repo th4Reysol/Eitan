@@ -11,12 +11,13 @@ const category = params.get("category") || "";
 const csvPath = params.get("csv");
 
 const wordEl = document.getElementById("quizWord");
-const dateStampEl = document.querySelector("#dateStamp .pill__label");
+const fiftyFiftyBtn = document.getElementById("fiftyFiftyBtn");
 const tiles = Array.from(document.querySelectorAll(".menu .tile"));
 
 let pool = [];
 let current = null;
 let locked = false;
+let fiftyFiftyUsed = false; // このボタンを今の問題で使用済みか
 let correct_Ans = []; // 正解した単語の履歴 [{ en, ja }, ...]
 let wrong_Ans = [];   // 不正解だった問題の「正解」情報の履歴 [{ en, ja }, ...]
 
@@ -99,6 +100,13 @@ function renderQuestion() {
     tile.classList.remove("tile--correct", "tile--incorrect", "tile--locked");
     tile.disabled = false;
   });
+
+  // 新しい問題になったら50:50を再び使えるようにする
+  fiftyFiftyUsed = false;
+  if (fiftyFiftyBtn) {
+    fiftyFiftyBtn.disabled = false;
+    fiftyFiftyBtn.classList.remove("tile--locked");
+  }
 }
 
 function handleAnswer(tile) {
@@ -129,6 +137,30 @@ function handleAnswer(tile) {
 tiles.forEach((tile) => {
   tile.addEventListener("click", () => handleAnswer(tile));
 });
+
+// --- 50:50(不正解の選択肢を2つグレーアウト) ---
+
+function useFiftyFifty() {
+  if (locked || !current || fiftyFiftyUsed) return;
+
+  const incorrectTiles = tiles.filter((t) => t.dataset.ja !== current.answer.ja);
+  const toGrayOut = shuffle(incorrectTiles).slice(0, 2);
+
+  toGrayOut.forEach((t) => {
+    t.disabled = true;
+    t.classList.add("tile--locked");
+  });
+
+  fiftyFiftyUsed = true;
+  if (fiftyFiftyBtn) {
+    fiftyFiftyBtn.disabled = true;
+    fiftyFiftyBtn.classList.add("tile--locked");
+  }
+}
+
+if (fiftyFiftyBtn) {
+  fiftyFiftyBtn.addEventListener("click", useFiftyFifty);
+}
 
 function showError(message) {
   wordEl.textContent = message;
@@ -170,17 +202,6 @@ async function loadPool() {
   }
 }
 
-// --- 日付表示 ---
-
-function stampToday() {
-  const now = new Date();
-  const yyyy = now.getFullYear();
-  const mm = String(now.getMonth() + 1).padStart(2, "0");
-  const dd = String(now.getDate()).padStart(2, "0");
-  dateStampEl.textContent = `${yyyy}${mm}${dd}`;
-}
-
-stampToday();
 loadPool();
 
 // --- 結果の保存(localStorage) ---

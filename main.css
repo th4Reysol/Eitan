@@ -264,6 +264,49 @@ a.pill {
 }
 
 /* ==========================================================================
+   Settings — color pickers (settings.html)
+   ========================================================================== */
+
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--color-mint-soft);
+  border-radius: var(--radius-tile);
+  padding: 14px 16px;
+}
+
+.settings-row__label {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.settings-row__select {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-ink);
+  background: var(--color-surface);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.settings-row__select:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
    Small screens
    ========================================================================== */
 
