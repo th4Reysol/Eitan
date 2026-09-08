@@ -10,50 +10,39 @@
 <link rel="stylesheet" href="main.css">
 </head>
 <body>
-
   <main class="stage">
     <div class="device">
-
       <div class="statusbar" aria-hidden="true">
         <span class="statusbar__time">hhmm</span>
         <span class="statusbar__icons">•••</span>
       </div>
-
       <header class="topbar">
         <h1 class="topbar__title">English SAGA</h1>
       </header>
-
       <nav class="menu" aria-label="学習カテゴリ">
-        <button type="button" class="tile" data-category="grade1" data-csv="/csv_files/eiken1.csv">
+        <button type="button" class="tile" data-category="grade1" data-csv="./csv_files/eiken1.csv">
           <span class="tile__label">Grade 1</span>
         </button>
-
-        <button type="button" class="tile" data-category="cnnee" data-csv="/csv_files/cnnee.csv">
+        <button type="button" class="tile" data-category="cnnee" data-csv="./csv_files/cnnee.csv">
           <span class="tile__label">CNN EE</span>
         </button>
-
-        <button type="button" class="tile" data-category="toeic" data-csv="/csv_files/toeic.csv">
+        <button type="button" class="tile" data-category="toeic" data-csv="./csv_files/toeic.csv">
           <span class="tile__label">TOEIC</span>
         </button>
-
-        <button type="button" class="tile" data-category="others" data-csv="/csv_files/others.csv">
+        <button type="button" class="tile" data-category="others" data-csv="./csv_files/others.csv">
           <span class="tile__label">Others</span>
         </button>
       </nav>
-
       <footer class="footer">
         <button type="button" class="pill pill--date">
           <span class="pill__label">Settings</span>
         </button>
-
         <button type="button" class="pill pill--exit">
           <span class="pill__label">Close This App</span>
         </button>
       </footer>
-
     </div>
   </main>
-
 <script src="index.js"></script>
 </body>
 </html>
