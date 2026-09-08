@@ -1,0 +1,290 @@
+/* ==========================================================================
+   English SAGA — Top screen mockup
+   Tokens
+   ========================================================================== */
+
+:root {
+  --color-canvas: #EEF9F6;
+  --color-canvas-edge: #DCF3ED;
+  --color-surface: #FFFFFF;
+
+  --color-mint: #6CE4CF;
+  --color-mint-strong: #45D2B7;
+  --color-mint-press: #33BFA5;
+  --color-mint-soft: #E4FBF6;
+
+  --color-ink: #12181C;
+  --color-ink-soft: #5B6C68;
+  --color-ink-faint: #9DB0AC;
+
+  --color-alert: #EA4D3D;
+  --color-alert-press: #D33F30;
+
+  --font-display: "Sora", "Hiragino Sans", "Noto Sans JP", sans-serif;
+
+  --radius-device: 44px;
+  --radius-tile: 26px;
+  --radius-pill: 22px;
+
+  --shadow-device: 0 40px 80px -30px rgba(18, 24, 28, 0.35);
+  --shadow-tile: 0 10px 20px -12px rgba(18, 24, 28, 0.25);
+}
+
+/* ==========================================================================
+   Reset & base
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-display);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+a.pill {
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ==========================================================================
+   Stage — the neutral backdrop the phone mockup sits on
+   ========================================================================== */
+
+.stage {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 20px;
+  background:
+    radial-gradient(circle at 50% -10%, var(--color-canvas-edge), var(--color-canvas) 60%);
+}
+
+/* ==========================================================================
+   Device — the app screen itself
+   ========================================================================== */
+
+.device {
+  width: 100%;
+  max-width: 380px;
+  background: var(--color-surface);
+  border-radius: var(--radius-device);
+  box-shadow: var(--shadow-device);
+  padding: 14px 20px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.statusbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 6px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink-faint);
+  letter-spacing: 0.02em;
+}
+
+/* ==========================================================================
+   Top bar — app title band
+   ========================================================================== */
+
+.topbar {
+  background: var(--color-mint);
+  border-radius: 20px;
+  padding: 26px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.topbar__title {
+  margin: 0;
+  font-size: clamp(28px, 7vw, 34px);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--color-ink);
+  text-align: center;
+}
+
+/* ==========================================================================
+   Menu — 2x2 category grid
+   ========================================================================== */
+
+.menu {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.tile {
+  background: var(--color-mint);
+  border-radius: var(--radius-tile);
+  aspect-ratio: 4 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-tile);
+  transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tile__label {
+  font-size: clamp(18px, 4.6vw, 22px);
+  font-weight: 700;
+  color: var(--color-ink);
+  text-align: center;
+  padding: 0 8px;
+}
+
+.tile:hover {
+  background: var(--color-mint-strong);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 26px -14px rgba(18, 24, 28, 0.32);
+}
+
+.tile:active {
+  background: var(--color-mint-press);
+  transform: translateY(0);
+  box-shadow: 0 6px 12px -8px rgba(18, 24, 28, 0.3);
+}
+
+.tile:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
+/* Quiz answer feedback states (game.html) */
+
+.tile--correct {
+  background: var(--color-mint-strong);
+  box-shadow: 0 0 0 3px var(--color-mint-press) inset;
+}
+
+.tile--incorrect {
+  background: var(--color-alert);
+}
+
+.tile--incorrect .tile__label {
+  color: #FFFFFF;
+}
+
+.tile--locked {
+  cursor: default;
+  opacity: 0.55;
+  transform: none !important;
+}
+
+.tile--locked:hover {
+  background: var(--color-mint);
+  box-shadow: var(--shadow-tile);
+}
+
+.tile--correct.tile--locked,
+.tile--incorrect.tile--locked {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   Footer — utility row (date stamp + exit)
+   ========================================================================== */
+
+.footer {
+  display: flex;
+  gap: 14px;
+}
+
+.pill {
+  flex: 1;
+  border-radius: var(--radius-pill);
+  padding: 14px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.pill__label {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.pill--date {
+  background: var(--color-mint);
+}
+
+.pill--date .pill__label {
+  color: var(--color-ink);
+}
+
+.pill--date:hover {
+  background: var(--color-mint-strong);
+}
+
+.pill--date:active {
+  background: var(--color-mint-press);
+  transform: translateY(1px);
+}
+
+.pill--exit {
+  background: var(--color-mint);
+}
+
+.pill--exit .pill__label {
+  color: var(--color-alert);
+}
+
+.pill--exit:hover {
+  background: var(--color-mint-strong);
+}
+
+.pill--exit:active {
+  background: var(--color-mint-press);
+  transform: translateY(1px);
+}
+
+.pill:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
+/* ==========================================================================
+   Small screens
+   ========================================================================== */
+
+@media (max-width: 360px) {
+  .device {
+    padding: 12px 14px 24px;
+    border-radius: 32px;
+  }
+
+  .footer {
+    flex-direction: column;
+  }
+}
+
+/* ==========================================================================
+   Reduced motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .tile,
+  .pill {
+    transition: none;
+  }
+}

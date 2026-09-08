@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English SAGA — Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="main.css">
+</head>
+<body>
+
+  <main class="stage">
+    <div class="device">
+
+      <div class="statusbar" aria-hidden="true">
+        <span class="statusbar__time">9:41</span>
+        <span class="statusbar__icons">•••</span>
+      </div>
+
+      <header class="topbar">
+        <h1 class="topbar__title" id="quizWord" aria-live="polite">EN_Word</h1>
+      </header>
+
+      <nav class="menu" aria-label="選択肢">
+        <button type="button" class="tile" data-index="0">
+          <span class="tile__label">Option 1</span>
+        </button>
+
+        <button type="button" class="tile" data-index="1">
+          <span class="tile__label">Option 2</span>
+        </button>
+
+        <button type="button" class="tile" data-index="2">
+          <span class="tile__label">Option 3</span>
+        </button>
+
+        <button type="button" class="tile" data-index="3">
+          <span class="tile__label">Option 4</span>
+        </button>
+      </nav>
+
+      <footer class="footer">
+        <button type="button" class="pill pill--date" id="dateStamp">
+          <span class="pill__label">50:50</span>
+        </button>
+
+        <button type="button" class="pill pill--exit" id="exitBtn">
+          <span class="pill__label">Back to TOP</span>
+        </button>
+      </footer>
+
+    </div>
+  </main>
+
+<script src="game.js"></script>
+</body>
+</html>
