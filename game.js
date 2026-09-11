@@ -88,6 +88,15 @@ function pickQuestion() {
   return { answer, options };
 }
 
+function applyLabelSizeClass(labelEl, text) {
+  labelEl.classList.remove("tile__label--long", "tile__label--very-long");
+  if (text.length > 45) {
+    labelEl.classList.add("tile__label--very-long");
+  } else if (text.length > 22) {
+    labelEl.classList.add("tile__label--long");
+  }
+}
+
 function renderQuestion() {
   current = pickQuestion();
   locked = false;
@@ -95,7 +104,9 @@ function renderQuestion() {
 
   tiles.forEach((tile, i) => {
     const option = current.options[i];
-    tile.querySelector(".tile__label").textContent = option.ja;
+    const labelEl = tile.querySelector(".tile__label");
+    labelEl.textContent = option.ja;
+    applyLabelSizeClass(labelEl, option.ja);
     tile.dataset.ja = option.ja;
     tile.classList.remove("tile--correct", "tile--incorrect", "tile--locked");
     tile.disabled = false;

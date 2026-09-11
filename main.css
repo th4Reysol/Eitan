@@ -135,7 +135,8 @@ a.pill {
 .tile {
   background: var(--color-mint);
   border-radius: var(--radius-tile);
-  aspect-ratio: 4 / 3;
+  min-height: 120px;
+  padding: 16px 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -144,11 +145,23 @@ a.pill {
 }
 
 .tile__label {
-  font-size: clamp(18px, 4.6vw, 22px);
+  font-size: clamp(16px, 4.2vw, 22px);
   font-weight: 700;
   color: var(--color-ink);
   text-align: center;
   padding: 0 8px;
+  line-height: 1.3;
+}
+
+/* 文字数が多い選択肢は、タイルが伸びすぎないようフォントを段階的に縮小する */
+.tile__label--long {
+  font-size: clamp(13px, 3.4vw, 16px);
+  line-height: 1.25;
+}
+
+.tile__label--very-long {
+  font-size: clamp(11px, 2.8vw, 13px);
+  line-height: 1.2;
 }
 
 .tile:hover {
