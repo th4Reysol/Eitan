@@ -126,10 +126,14 @@ function handleAnswer(tile) {
 
   const isCorrect = tile.dataset.ja === current.answer.ja;
 
+  // 結果は回答した瞬間に localStorage へ保存する
+  // (Back to TOP を押さずにタブを閉じても、習得済み・間違いの記録が消えないようにするため)
   if (isCorrect) {
     correct_Ans.push({ en: current.answer.en, ja: current.answer.ja });
+    saveSafely(() => addMasteredWords(category, [current.answer.en]));
   } else {
     wrong_Ans.push({ en: current.answer.en, ja: current.answer.ja });
+    saveSafely(() => appendReviewWords(category, [{ en: current.answer.en, ja: current.answer.ja }]));
     // 間違えたらその場で avengers/avengers.csv に書き足す(クリック操作中に呼ぶ必要がある)
     appendWrongToAvengers({ en: current.answer.en, ja: current.answer.ja });
   }
@@ -223,15 +227,23 @@ async function loadPool() {
 loadPool();
 
 // --- 結果の保存(localStorage) ---
-// ・correct_Ans に含まれる単語は「習得済み」として localStorage に記録し、
-//   以後そのカテゴリの出題から除外する
-// ・wrong_Ans は localStorage に蓄積しつつ、TOPに戻るときに yyyyMMdd_hhmmss.csv
+// ・正解した単語は、回答した瞬間に「習得済み」として localStorage に記録し、
+//   以後そのカテゴリの出題から除外する(次回の読み込みから反映)
+// ・間違えた単語は、回答した瞬間に localStorage に蓄積し、TOPに戻るときに yyyyMMdd_hhmmss.csv
 //   としてダウンロードし、さらに間違えるたびに avengers/avengers.csv へ書き足す
 //   (詳細は下の「間違えた問題の保存」の説明)
 // PC/Android/GitHub Pagesなど環境を問わず同じコードで動作する。
 
 const MASTERED_KEY_PREFIX = "englishSaga:masteredWords:";
 const REVIEW_KEY = "englishSaga:reviewWords";
+
+function saveSafely(fn) {
+  try {
+    fn();
+  } catch (err) {
+    console.error("結果の保存に失敗しました:", err);
+  }
+}
 
 function getMasteredWords(cat) {
   if (!cat) return new Set();
@@ -413,8 +425,7 @@ function downloadReviewCsv(entries) {
 
 async function handleExit() {
   try {
-    addMasteredWords(category, correct_Ans.map((w) => w.en));
-    appendReviewWords(category, wrong_Ans);
+    // 習得済み・間違いの localStorage 保存は回答時に済んでいるので、ここではCSVのダウンロードのみ
     downloadReviewCsv(wrong_Ans);
     // avengers.csv への書き足しが終わってから画面を移動する
     await avengersWriteChain;
