@@ -108,7 +108,7 @@ function renderQuestion() {
     labelEl.textContent = option.ja;
     applyLabelSizeClass(labelEl, option.ja);
     tile.dataset.ja = option.ja;
-    tile.classList.remove("tile--correct", "tile--incorrect", "tile--locked");
+    tile.classList.remove("tile--correct", "tile--incorrect", "tile--wrong", "tile--locked");
     tile.disabled = false;
   });
 
@@ -136,13 +136,18 @@ function handleAnswer(tile) {
     t.disabled = true;
     t.classList.add("tile--locked");
     if (t.dataset.ja === current.answer.ja) {
+      // 正解の選択肢: 強調表示(✓バッジ・拡大・枠線)
       t.classList.add("tile--correct");
-    } else if (t === tile && !isCorrect) {
-      t.classList.add("tile--incorrect");
+    } else {
+      // 不正解の選択肢: すべてに赤い×印を付ける
+      t.classList.add("tile--wrong");
+      // 自分が選んでしまった不正解は、さらに赤枠で目立たせる
+      if (t === tile) t.classList.add("tile--incorrect");
     }
   });
 
-  window.setTimeout(renderQuestion, 900);
+  // 間違えたときは正解を確認できるよう、次の問題までの時間を長めにとる
+  window.setTimeout(renderQuestion, isCorrect ? 900 : 1800);
 }
 
 tiles.forEach((tile) => {

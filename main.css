@@ -20,6 +20,10 @@
   --color-alert: #EA4D3D;
   --color-alert-press: #D33F30;
 
+  /* 不正解の×印・赤枠の色。theme.js がボタン色の補色で上書きする */
+  --color-cross: #EA4D3D;
+  --color-cross-soft: #FDE3E0;
+
   --font-display: "Sora", "Hiragino Sans", "Noto Sans JP", sans-serif;
 
   --radius-device: 44px;
@@ -183,17 +187,8 @@ a.pill {
 
 /* Quiz answer feedback states (game.html) */
 
-.tile--correct {
-  background: var(--color-mint-strong);
-  box-shadow: 0 0 0 3px var(--color-mint-press) inset;
-}
-
-.tile--incorrect {
-  background: var(--color-alert);
-}
-
-.tile--incorrect .tile__label {
-  color: #FFFFFF;
+.tile {
+  position: relative; /* ×印・✓バッジの配置基準 */
 }
 
 .tile--locked {
@@ -207,9 +202,77 @@ a.pill {
   box-shadow: var(--shadow-tile);
 }
 
-.tile--correct.tile--locked,
-.tile--incorrect.tile--locked {
+/* --- 正解: 濃い色・太い枠・拡大・✓バッジで強調 --- */
+.tile--correct.tile--locked {
   opacity: 1;
+  z-index: 2;
+  background: var(--color-mint-strong);
+  box-shadow:
+    0 0 0 4px var(--color-ink),
+    0 18px 30px -14px rgba(18, 24, 28, 0.45);
+  scale: 1.06;
+  animation: tile-correct-pop 0.35s ease-out;
+}
+
+.tile--correct .tile__label {
+  font-weight: 800;
+}
+
+.tile--correct::before {
+  content: "✓";
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--color-ink);
+  color: #FFFFFF;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 34px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(18, 24, 28, 0.3);
+}
+
+/* --- 不正解: 色を落として×印(ボタン色の補色)を重ねる --- */
+.tile--wrong.tile--locked {
+  opacity: 1; /* ×印まで薄くならないよう、タイル自体は不透明のまま */
+  background: var(--color-mint-soft);
+  box-shadow: none;
+}
+
+.tile--wrong .tile__label {
+  opacity: 0.4;
+}
+
+.tile--wrong::after {
+  content: "";
+  position: absolute;
+  inset: -10px;
+  pointer-events: none;
+  /* ×印の形をマスクで切り抜き、色は --color-cross(ボタン色の補色)で塗る */
+  background: var(--color-cross);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M4 4L96 96M96 4L4 96' stroke='%23000' stroke-width='5' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M4 4L96 96M96 4L4 96' stroke='%23000' stroke-width='5' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  animation: tile-wrong-cross 0.25s ease-out;
+}
+
+/* 自分が選んだ不正解は、補色の枠と薄い補色の背景でさらに目立たせる */
+.tile--incorrect.tile--locked {
+  background: var(--color-cross-soft);
+  box-shadow: 0 0 0 4px var(--color-cross);
+}
+
+@keyframes tile-correct-pop {
+  0%   { scale: 1; }
+  60%  { scale: 1.1; }
+  100% { scale: 1.06; }
+}
+
+@keyframes tile-wrong-cross {
+  from { opacity: 0; scale: 0.85; }
+  to   { opacity: 1; scale: 1; }
 }
 
 /* ==========================================================================
@@ -342,5 +405,10 @@ a.pill {
   .tile,
   .pill {
     transition: none;
+  }
+
+  .tile--correct.tile--locked,
+  .tile--wrong::after {
+    animation: none;
   }
 }
