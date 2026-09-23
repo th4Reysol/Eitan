@@ -130,6 +130,8 @@ function handleAnswer(tile) {
     correct_Ans.push({ en: current.answer.en, ja: current.answer.ja });
   } else {
     wrong_Ans.push({ en: current.answer.en, ja: current.answer.ja });
+    // 間違えたらその場で avengers/avengers.csv に書き足す(クリック操作中に呼ぶ必要がある)
+    appendWrongToAvengers({ en: current.answer.en, ja: current.answer.ja });
   }
 
   tiles.forEach((t) => {
@@ -223,8 +225,9 @@ loadPool();
 // --- 結果の保存(localStorage) ---
 // ・correct_Ans に含まれる単語は「習得済み」として localStorage に記録し、
 //   以後そのカテゴリの出題から除外する
-// ・wrong_Ans は localStorage に蓄積しつつ、TOPに戻るタイミングで
-//   yyyyMMdd_hhmmss.csv としてブラウザのダウンロード機能で保存する
+// ・wrong_Ans は localStorage に蓄積しつつ、TOPに戻るときに yyyyMMdd_hhmmss.csv
+//   としてダウンロードし、さらに間違えるたびに avengers/avengers.csv へ書き足す
+//   (詳細は下の「間違えた問題の保存」の説明)
 // PC/Android/GitHub Pagesなど環境を問わず同じコードで動作する。
 
 const MASTERED_KEY_PREFIX = "englishSaga:masteredWords:";
@@ -273,26 +276,148 @@ function formatTimestamp(date) {
   return `${yyyy}${MM}${dd}_${hh}${mm}${ss}`;
 }
 
-// wrong_Ans をCSVとして端末にダウンロードする(for_reviewフォルダの代わり)
+// --- 間違えた問題の保存 ---
+// 間違えた問題は、次の2か所に保存する。
+//
+// (1) ダウンロードフォルダ … 従来どおり「Back to TOP」を押したときに、
+//     このプレイ分の間違いを yyyyMMdd_hhmmss.csv としてダウンロードする。
+//     (ファイル名はクイズを開始した日時)
+//
+// (2) avengers フォルダ … 間違えるたびに avengers/avengers.csv へ1行ずつ書き足す。
+//     すでに avengers.csv にある英単語は重複して書き足さない。
+//     ブラウザは任意のフォルダへ勝手に書き込めないため、Chrome/Edge の
+//     File System Access API を使う。初回だけフォルダ選択画面が出るので
+//     Eitan/avengers を選ぶ。選んだフォルダは IndexedDB に記憶し、次回以降は
+//     自動で同じフォルダへ書き足す(ページを開き直した直後は、Chromeが
+//     保存の許可を確認することがある)。
+//     この機能が使えないブラウザ(Android/Safari/Firefoxなど)や、フォルダ選択を
+//     キャンセルした場合は (2) を行わず、(1) だけになる。
+
+const sessionFileName = `${formatTimestamp(new Date())}.csv`;
+const AVENGERS_FILE = "avengers.csv";
+const AVENGERS_DB = "englishSaga";
+const AVENGERS_STORE = "handles";
+const AVENGERS_KEY = "avengersDir";
+
+let avengersPickerDeclined = false; // この回でフォルダ選択をキャンセルしたか
+let avengersWriteChain = Promise.resolve(); // 書き込みを順番に実行するためのキュー
+
+function csvCell(value) {
+  const v = String(value ?? "");
+  return /[",\r\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
+}
+
+function buildReviewCsv(entries) {
+  return entries.map((w) => `${csvCell(w.en)},${csvCell(w.ja)}`).join("\r\n") + "\r\n";
+}
+
+function openHandleDb() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(AVENGERS_DB, 1);
+    req.onupgradeneeded = () => req.result.createObjectStore(AVENGERS_STORE);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function loadAvengersDir() {
+  const db = await openHandleDb();
+  return new Promise((resolve, reject) => {
+    const req = db.transaction(AVENGERS_STORE).objectStore(AVENGERS_STORE).get(AVENGERS_KEY);
+    req.onsuccess = () => resolve(req.result || null);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function storeAvengersDir(handle) {
+  const db = await openHandleDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(AVENGERS_STORE, "readwrite");
+    tx.objectStore(AVENGERS_STORE).put(handle, AVENGERS_KEY);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+// 書き込み可能な avengers フォルダを取得する(無ければ選択してもらう)
+async function getAvengersDir() {
+  let dir = await loadAvengersDir();
+
+  if (dir) {
+    const opts = { mode: "readwrite" };
+    if ((await dir.queryPermission(opts)) === "granted") return dir;
+    if ((await dir.requestPermission(opts)) === "granted") return dir;
+    dir = null; // 許可されなかった場合は選び直してもらう
+  }
+
+  if (avengersPickerDeclined) return null;
+  try {
+    dir = await window.showDirectoryPicker({ id: "avengers", mode: "readwrite", startIn: "desktop" });
+  } catch (err) {
+    avengersPickerDeclined = true; // キャンセル時は、この回はもう聞かない
+    return null;
+  }
+  if (dir.name !== "avengers") {
+    console.warn(`選択されたフォルダは「${dir.name}」です(avengers ではありません)`);
+  }
+  await storeAvengersDir(dir);
+  return dir;
+}
+
+// avengers.csv の末尾に1語書き足す(既にある英単語なら何もしない)
+function appendWrongToAvengers(entry) {
+  if (typeof window.showDirectoryPicker !== "function") return; // 非対応ブラウザ
+
+  avengersWriteChain = avengersWriteChain.then(async () => {
+    try {
+      const dir = await getAvengersDir();
+      if (!dir) return;
+
+      const fileHandle = await dir.getFileHandle(AVENGERS_FILE, { create: true });
+      const file = await fileHandle.getFile();
+      const existing = await file.text();
+
+      const known = new Set(
+        existing
+          .split(/\r\n|\n|\r/)
+          .filter((line) => line.trim().length > 0)
+          .map((line) => parseCSVLine(line)[0])
+      );
+      if (known.has(entry.en)) return;
+
+      // 既存の内容を残したまま、ファイルの末尾に書き足す
+      const writable = await fileHandle.createWritable({ keepExistingData: true });
+      await writable.seek(file.size);
+      const needsNewline = existing.length > 0 && !/[\r\n]$/.test(existing);
+      await writable.write((needsNewline ? "\r\n" : "") + buildReviewCsv([entry]));
+      await writable.close();
+    } catch (err) {
+      console.error("avengers.csv への書き足しに失敗しました:", err);
+    }
+  });
+}
+
+// このプレイ分の間違いをCSVとして端末のダウンロードフォルダに保存する
 function downloadReviewCsv(entries) {
   if (entries.length === 0) return;
-  const body = entries.map((w) => `${w.en},${w.ja}`).join("\r\n") + "\r\n";
-  const blob = new Blob([body], { type: "text/csv;charset=utf-8;" });
+  const blob = new Blob([buildReviewCsv(entries)], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `${formatTimestamp(new Date())}.csv`;
+  a.download = sessionFileName;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
 
-function handleExit() {
+async function handleExit() {
   try {
     addMasteredWords(category, correct_Ans.map((w) => w.en));
     appendReviewWords(category, wrong_Ans);
     downloadReviewCsv(wrong_Ans);
+    // avengers.csv への書き足しが終わってから画面を移動する
+    await avengersWriteChain;
   } catch (err) {
     console.error("結果の保存に失敗しました:", err);
   }
