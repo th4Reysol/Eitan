@@ -363,9 +363,8 @@ async function getAvengersDir() {
   }
 
   if (avengersPickerDeclined) return null;
-  try {
-    dir = await window.showDirectoryPicker({ id: "avengers", mode: "readwrite", startIn: "desktop" });
-  } catch (err) {
+  dir = await askAvengersFolder();
+  if (!dir) {
     avengersPickerDeclined = true; // キャンセル時は、この回はもう聞かない
     return null;
   }
@@ -374,6 +373,42 @@ async function getAvengersDir() {
   }
   await storeAvengersDir(dir);
   return dir;
+}
+
+// フォルダ選択の前に「avengers フォルダを作成してください」という案内を表示する。
+// 「フォルダを選択」ボタンのクリック内で showDirectoryPicker を呼ぶ
+// (ブラウザはユーザー操作の直後でないとフォルダ選択画面を開けないため)。
+// 選ばれたフォルダのハンドルを返す。キャンセル時は null。
+function askAvengersFolder() {
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.className = "notice";
+    overlay.innerHTML = `
+      <div class="notice__box" role="dialog" aria-modal="true" aria-labelledby="avengersNoticeTitle">
+        <p class="notice__title" id="avengersNoticeTitle">間違えた単語の保存先</p>
+        <p class="notice__text">任意の場所に次の名称のフォルダを作成してください。</p>
+        <p class="notice__name">avengers</p>
+        <p class="notice__text notice__text--sub">作成したら「フォルダを選択」を押し、そのフォルダを選んでください。(選択画面の「新規フォルダ」からも作成できます)</p>
+        <div class="notice__actions">
+          <button type="button" class="pill pill--date" data-action="pick"><span class="pill__label">フォルダを選択</span></button>
+          <button type="button" class="pill pill--exit" data-action="skip"><span class="pill__label">今回は保存しない</span></button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    const finish = (dir) => {
+      overlay.remove();
+      resolve(dir);
+    };
+
+    overlay.querySelector('[data-action="pick"]').addEventListener("click", () => {
+      window
+        .showDirectoryPicker({ id: "avengers", mode: "readwrite", startIn: "desktop" })
+        .then((dir) => finish(dir))
+        .catch(() => finish(null));
+    });
+    overlay.querySelector('[data-action="skip"]').addEventListener("click", () => finish(null));
+  });
 }
 
 // avengers.csv の末尾に1語書き足す(既にある英単語なら何もしない)

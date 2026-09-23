@@ -412,3 +412,70 @@ a.pill {
     animation: none;
   }
 }
+
+/* ==========================================================================
+   Notice (avengers フォルダ作成の案内)
+   ========================================================================== */
+
+.notice {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(18, 24, 28, 0.45);
+}
+
+.notice__box {
+  width: 100%;
+  max-width: 340px;
+  padding: 24px 20px 20px;
+  border-radius: var(--radius-tile);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-device);
+  text-align: center;
+  font-family: var(--font-display);
+}
+
+.notice__title {
+  margin: 0 0 12px;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.notice__text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.notice__text--sub {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--color-ink-soft);
+}
+
+.notice__name {
+  margin: 12px 0;
+  padding: 10px;
+  border-radius: 12px;
+  background: var(--color-mint-soft);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  user-select: all;
+}
+
+.notice__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.notice__actions .pill {
+  width: 100%;
+}
