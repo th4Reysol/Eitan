@@ -382,6 +382,69 @@ a.pill {
   outline-offset: 2px;
 }
 
+/* 色見本(丸ボタン)。選択中は ink 色のリングで示す(色に頼らず形でも分かる) */
+
+.settings-row--swatches {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 5px; /* 選択リングが切れないよう余白を確保 */
+  margin: -5px;  /* 余白分を打ち消し、見出しと左端をそろえる */
+}
+
+.swatch {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--swatch);
+  /* 背景色の見本は白に近いので、輪郭線を付けて行の背景と区別する */
+  border: 1px solid rgba(18, 24, 28, 0.22);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.swatch:hover {
+  transform: scale(1.12);
+}
+
+.swatch[aria-pressed="true"] {
+  box-shadow:
+    0 0 0 3px var(--color-mint-soft),
+    0 0 0 5px var(--color-ink);
+}
+
+.swatch:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
+/* 読みにくい組み合わせで APPLY したときの警告 */
+
+.settings-message {
+  padding: 12px 14px;
+  border-radius: 16px;
+  border-left: 5px solid var(--color-alert);
+  background: #FDE3E0;
+  color: #5A1710;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.55;
+}
+
+.settings-message p {
+  margin: 0;
+}
+
+.settings-message p + p {
+  margin-top: 6px;
+}
+
 /* ==========================================================================
    Small screens
    ========================================================================== */
@@ -403,7 +466,8 @@ a.pill {
 
 @media (prefers-reduced-motion: reduce) {
   .tile,
-  .pill {
+  .pill,
+  .swatch {
     transition: none;
   }
 

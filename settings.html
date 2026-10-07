@@ -24,41 +24,26 @@
         <h1 class="topbar__title">Settings</h1>
       </header>
 
+      <!-- 色見本(丸ボタン)は settings.js が PALETTES から生成する -->
       <section class="settings-list" aria-label="カラー設定">
-        <div class="settings-row">
-          <span class="settings-row__label">Text Color</span>
-          <select class="settings-row__select" id="textColorSelect">
-            <option value="#12181C">Default</option>
-            <option value="#2E2E2E">Charcoal</option>
-            <option value="#1B2A4A">Navy</option>
-            <option value="#3C4858">Slate</option>
-            <option value="#1F3D34">Dark Green</option>
-          </select>
+        <div class="settings-row settings-row--swatches">
+          <span class="settings-row__label" id="textColorLabel">Text Color</span>
+          <div class="swatches" id="textColorSwatches" role="group" aria-labelledby="textColorLabel"></div>
         </div>
 
-        <div class="settings-row">
-          <span class="settings-row__label">Button Color</span>
-          <select class="settings-row__select" id="buttonColorSelect">
-            <option value="#6CE4CF">Default</option>
-            <option value="#FF8C7A">Coral</option>
-            <option value="#6CB4E4">Sky Blue</option>
-            <option value="#F2B84B">Amber</option>
-            <option value="#B79CED">Lavender</option>
-            <option value="#F2879B">Rose</option>
-          </select>
+        <div class="settings-row settings-row--swatches">
+          <span class="settings-row__label" id="buttonColorLabel">Button Color</span>
+          <div class="swatches" id="buttonColorSwatches" role="group" aria-labelledby="buttonColorLabel"></div>
         </div>
 
-        <div class="settings-row">
-          <span class="settings-row__label">Back Color</span>
-          <select class="settings-row__select" id="backColorSelect">
-            <option value="#EEF9F6">Default</option>
-            <option value="#FBF3E7">Cream</option>
-            <option value="#EDEFF1">Soft Gray</option>
-            <option value="#FBEAEE">Blush</option>
-            <option value="#E8F2FB">Sky</option>
-          </select>
+        <div class="settings-row settings-row--swatches">
+          <span class="settings-row__label" id="backColorLabel">Back Color</span>
+          <div class="swatches" id="backColorSwatches" role="group" aria-labelledby="backColorLabel"></div>
         </div>
       </section>
+
+      <!-- 読みにくい色の組み合わせで APPLY したときだけ表示される -->
+      <div class="settings-message" id="contrastMessage" role="alert" hidden></div>
 
       <footer class="footer">
         <button type="button" class="pill pill--date" id="applyBtn">
